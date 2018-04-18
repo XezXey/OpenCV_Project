@@ -21,6 +21,8 @@ import math
 import numpy as np
 import cv2 as cv
 
+count = 1
+first_square_attr = {"area" : 0, "width" : 0, "height" : 0}
 
 def angle_cos(p0, p1, p2):
     d1, d2 = (p0-p1).astype('float'), (p2-p1).astype('float')
@@ -48,39 +50,63 @@ def find_squares(img):
     return squares
 
 def compare_increment(initial_square, final_square):
+    global first_square_attr
     initial_square_attr = {"area" : 0, "width" : 0, "height" : 0}
     final_square_attr = {"area" : 0, "width" : 0, "height" : 0}
     different_square_attr = {"area" : 0, "width" : 0, "height" : 0}
-    
+    different_from_frist_square_attr = {"area" : 0, "width" : 0, "height" : 0}
+    global count
+
+    """
     #Calculate initial square attributes
-    initial_square_attr["width"] = math.sqrt(pow(initial_square[0][0] - initial_square[2][0], 2) + pow(initial_square[0][1] - initial_square[2][1], 2))
-    initial_square_attr["height"] = math.sqrt(pow(initial_square[0][0] - initial_square[1][0], 2) + pow(initial_square[0][1] - initial_square[1][1], 2))
+    initial_square_attr["width"] = (math.sqrt(pow(initial_square[0][0] - initial_square[3][0], 2) + pow(initial_square[0][1] - initial_square[3][1], 2))) / 14.66835
+    initial_square_attr["height"] = (math.sqrt(pow(initial_square[0][0] - initial_square[1][0], 2) + pow(initial_square[0][1] - initial_square[1][1], 2))) / 14.66835
     initial_square_attr["area"] = initial_square_attr["width"] * initial_square_attr["height"]
-    print("************************************************", end = "\n")
+    print("*********************[" + str(count) + "]************************", end = "\n")
+    count = count + 1
     print("Initial square : \n" + "Area : " + str(initial_square_attr["area"])
             + "\nWidth : " + str(initial_square_attr["width"])
             + "\nHeight : " + str(initial_square_attr["height"]), end = "\n")
     print("************************************************", end = "\n")
-
+    """
 
     #Calculate final square attributes
-    final_square_attr["width"] = math.sqrt(pow(final_square[0][0] - final_square[2][0], 2) + pow(final_square[0][1] - final_square[2][1], 2))
-    final_square_attr["height"] = math.sqrt(pow(final_square[0][0] - final_square[1][0], 2) + pow(final_square[0][1] - final_square[1][1], 2))
+    final_square_attr["width"] = (math.sqrt(pow(final_square[0][0] - final_square[3][0], 2) + pow(final_square[0][1] - final_square[3][1], 2))) / 14.66835
+    final_square_attr["height"] = (math.sqrt(pow(final_square[0][0] - final_square[1][0], 2) + pow(final_square[0][1] - final_square[1][1], 2))) / 14.66835
     final_square_attr["area"] = final_square_attr["width"] * final_square_attr["height"]
-    print("************************************************", end = "\n")
-    print("Final square : \n" + "Area : " + str(final_square_attr["area"])
+    print("*********************[" + str(count) + "]************************", end = "\n")
+    count = count + 1
+    print("Current square : \n" + "Area : " + str(final_square_attr["area"])
             + "\nWidth : " + str(final_square_attr["width"])
             + "\nHeight : " + str(final_square_attr["height"]), end = "\n")
     print("************************************************", end = "\n")
 
-    #Calculate difference
+    print("************************************************", end = "\n")
+    print("First square : \n" + "Area : " + str(first_square_attr["area"])
+            + "\nWidth : " + str(first_square_attr["width"])
+            + "\nHeight : " + str(first_square_attr["height"]), end = "\n")
+    print("************************************************", end = "\n")
+
+    """
+    #Calculate difference from previous
     different_square_attr["width"] = final_square_attr["width"] - initial_square_attr["width"]
     different_square_attr["height"] = final_square_attr["height"] - initial_square_attr["height"]
     different_square_attr["area"] = final_square_attr["area"] - initial_square_attr["area"]
     print("************************************************", end = "\n")
-    print("Difference : \n" + "Area : " + str(different_square_attr["area"])
+    print("Difference from previous: \n" + "Area : " + str(different_square_attr["area"])
             + "\nWidth : " + str(different_square_attr["width"])
             + "\nHeight : " + str(different_square_attr["height"]), end = "\n")
+    print("************************************************", end = "\n")
+    """ 
+    
+    #Calculate difference from the first
+    different_from_frist_square_attr["width"] = final_square_attr["width"] - first_square_attr["width"]
+    different_from_frist_square_attr["height"] = final_square_attr["height"] - first_square_attr["height"]
+    different_from_frist_square_attr["area"] = final_square_attr["area"] - first_square_attr["area"]
+    print("************************************************", end = "\n")
+    print("Difference from the first: \n" + "Area : " + str(different_from_frist_square_attr["area"])
+            + "\nWidth : " + str(different_from_frist_square_attr["width"])
+            + "\nHeight : " + str(different_from_frist_square_attr["height"]), end = "\n")
     print("************************************************", end = "\n")
 
     
@@ -90,7 +116,7 @@ def find_smallest_square(squares, img):
     min_area = original_height * original_width
     area = 0
     min_area_index = 0
-    #The point of each square is not order but we can know that point[0] opposite to point[3] also point[1] and point[2]
+    #The point of each square is not order but we can know that point[0] opposite to point[3] also point[1] and point[2] ==> Black opposite to Blue, Red opposite to Green
     for index, each_square in enumerate(squares):
         """
         cv.circle(img, tuple(each_square[0]), 20, (0, 0, 0))    #BLACK
@@ -99,21 +125,24 @@ def find_smallest_square(squares, img):
         cv.circle(img, tuple(each_square[3]), 20, (0, 0, 255))  #BLUE
         """
         height = math.sqrt(pow(each_square[0][0] - each_square[1][0], 2) + pow(each_square[0][1] - each_square[1][1], 2))
-        width = math.sqrt(pow(each_square[0][0] - each_square[2][0], 2) + pow(each_square[0][1] - each_square[2][1], 2))
+        width = math.sqrt(pow(each_square[0][0] - each_square[3][0], 2) + pow(each_square[0][1] - each_square[3][1], 2))
         area = int(height * width)
         #print("Area = " + str(area) + ", Min Area = " + str(min_area))
         if (area < min_area) and (area != original_height - 1) * (original_width - 1):
             #print("Min Area : " + str(min_area))
             min_area = area
             min_area_index = index
-            print("INDEX : " + str(index))
+            #print("INDEX : " + str(index))
     #print(squares[min_area_index])
-    if squares[min_area_index] is None:
-        print("NULL")
+
+    #if squares[min_area_index] is None:
+        #print("NULL")
+    
     return squares[min_area_index]
         
 if __name__ == '__main__':
     from glob import glob
+    first_square_attr  = {"area" : 0, "width" : 0, "height" : 0}
     if not USE_CAM:
         for fn in glob("./*.jpg"):
             img = cv.imread(fn)
@@ -125,26 +154,26 @@ if __name__ == '__main__':
             cv.drawContours(img, [squares.astype(np.int32)], -1, (0, 255, 0), 3)
             cv.circle(img, tuple(squares[0]), 20, (0, 0, 0))    #BLACK
             cv.circle(img, tuple(squares[1]), 20, (0, 255, 0))  #GREEN
-            cv.circle(img, tuple(squares[2]), 20, (255, 0, 0))    #RED
-            cv.circle(img, tuple(squares[3]), 20, (0, 0, 255))  #BLUE
+            cv.circle(img, tuple(squares[2]), 20, (255, 0, 0))    #BLUE
+            cv.circle(img, tuple(squares[3]), 20, (0, 0, 255))  #RED
             cv.imshow('squares', img)
-            ch = cv.waitKey()
+            ch = cv.waitKey(1)
             if ch == 115:   #Press S to save (ASCII)
                 initial_square = squares
                 print("Init an initial square!!!")
             elif ch == 83:
                 final_square = squares
-                print("Init a final square!!!")
+                print("Init a current square!!!")
                 compare_increment(initial_square, final_square)
             elif ch == 113:
                 print("EXIT...")
                 break
                 
     else:
-        cap = cv.VideoCapture("http://192.168.111.16:8080/video")
+        cap = cv.VideoCapture("http://172.30.88.49:8080/video")
         while(True):
             ret, frame = cap.read()
-            frame = cv.resize(frame, (900, 900)) 
+            frame = cv.resize(frame, (640, 360)) 
             squares = find_squares(frame)
             if not squares :
                 print("NULL")
@@ -156,7 +185,7 @@ if __name__ == '__main__':
             cv.circle(frame, tuple(squares[2]), 20, (255, 0, 0))    #RED
             cv.circle(frame, tuple(squares[3]), 20, (0, 0, 255))  #BLUE
             cv.imshow("frame", frame)
-            h = cv.waitKey()
+            ch = cv.waitKey(1)
             if ch == 115:   #Press S to save (ASCII)
                 initial_square = squares
                 print("Init an initial square!!!")
@@ -164,6 +193,11 @@ if __name__ == '__main__':
                 final_square = squares
                 print("Init a final square!!!")
                 compare_increment(initial_square, final_square)
+            elif ch == 102:     # Press f to save first square (ASCII)
+                print("Init a first square!!!")
+                first_square_attr["width"] = (math.sqrt(pow(squares[0][0] - squares[3][0], 2) + pow(squares[0][1] - squares[3][1], 2))) / 14.66835
+                first_square_attr["height"] = (math.sqrt(pow(squares[0][0] - squares[1][0], 2) + pow(squares[0][1] - squares[1][1], 2))) / 14.66835
+                first_square_attr["area"] = first_square_attr["width"] * first_square_attr["height"]
             elif ch == 113:
                 print("EXIT...")
                 break
